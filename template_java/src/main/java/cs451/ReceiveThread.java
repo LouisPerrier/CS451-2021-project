@@ -12,6 +12,8 @@ public class ReceiveThread extends Thread {
 
     @Override
     public void run() {
+
+
         while (true) {
             fairlossLink.receive();
         }

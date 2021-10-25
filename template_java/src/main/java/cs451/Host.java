@@ -2,6 +2,9 @@ package cs451;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class Host {
 
@@ -75,7 +78,8 @@ public class Host {
         receiveThread.start();
 
         for (int i =1 ; i<=nbMessages ; i++) {
-            perfectLink.send(new Message(i, id, new int[nbHosts]), receiver.getIp(), receiver.getPort())
+            perfectLink.send(new Message(i, id, new int[nbHosts]), receiver.getIp(), receiver.getPort());
+	
             Main.outputBuffer.add("b " + i);
         }
     }

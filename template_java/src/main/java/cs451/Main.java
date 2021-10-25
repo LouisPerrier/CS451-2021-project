@@ -1,9 +1,8 @@
 package cs451;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
+import java.util.*;
 
 public class Main {
 
@@ -71,32 +70,31 @@ public class Main {
         System.out.println();
 
         int nbMessages = 0;
-        if (parser.hasConfig()) {
+Host receiver = null;
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(new File(parser.config())));
-                String s = reader.readLine();
-                s = s.replace(" ", "")
-                nbMessages = Integer.parse(s.charAt(0));
-                int receiverId = Integer.parse(s.charAt(1));
-                Host receiver;
+               String[] s = reader.readLine().split(" ");
+                nbMessages = Integer.parseInt(s[0]);
+                int receiverId = Integer.parseInt(s[1]);
                 for (Host h : parser.hosts()) {
-                    if (h.getId() == receiver.getId()) receiver = h;
+                    if (h.getId() == receiverId) receiver = h;
                 }
                 reader.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            if (myHost != null) {
+            if (myHost != null && receiver  != null  ) {
                 myHost.init(parser.hosts(), nbMessages, receiver);
             } else {
                 System.out.println("Invalid id");
             }
-        }
+        
 
         System.out.println("Path to output:");
         System.out.println("===============");
         System.out.println(parser.output() + "\n");
+outputPath = parser.output();
 
         System.out.println("Path to config:");
         System.out.println("===============");

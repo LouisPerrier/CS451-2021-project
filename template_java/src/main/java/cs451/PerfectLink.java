@@ -64,8 +64,8 @@ public class PerfectLink implements Listener {
 
             if (!delivered.contains(m)) {
                 delivered.add(m);
-                listener.deliver(m, srcId);
-                Main.outputBuffer.add("d " + m.senderId + " " + m.seq)
+		
+                Main.outputBuffer.add("d " + m.message.senderId + " " + m.message.seq);
             }
         }
     }

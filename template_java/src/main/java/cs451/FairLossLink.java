@@ -51,12 +51,12 @@ public class FairLossLink extends UnderlyingProtocol {
     public void receive() {
         byte[] buf = new byte[24+4*nHosts];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
+
         try {
             socket.receive(packet);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         ByteBuffer bb = ByteBuffer.wrap(packet.getData());
         int seq = bb.getInt();
         int senderId = bb.getInt();
