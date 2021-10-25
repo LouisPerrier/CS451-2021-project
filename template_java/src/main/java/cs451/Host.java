@@ -11,6 +11,12 @@ public class Host {
     private String ip;
     private int port = -1;
 
+    private ReceiveThread receiveThread;
+    private Host receiver;
+    private int nbHosts;
+    private int nbMessages;
+    private PerfectLink perfectLink;
+
     public boolean populate(String idString, String ipString, String portString) {
         try {
             id = Integer.parseInt(idString);
@@ -41,6 +47,18 @@ public class Host {
         return true;
     }
 
+    public void init(List<Host> hosts, int nbMessages, Host receiver) {
+        nbHosts = hosts.size();
+        this.receiver = receiver;
+
+        FairLossLink fairlossLink = new FairLossLink(ip, port, hosts);
+        perfectLink = new PerfectLink(fairlossLink, hosts);
+
+        receiveThread = new ReceiveThread(fairlossLink);
+
+        this.nbMessages = nbMessages;
+    }
+
     public int getId() {
         return id;
     }
@@ -51,6 +69,15 @@ public class Host {
 
     public int getPort() {
         return port;
+    }
+
+    public void broadcast() {
+        receiveThread.start();
+
+        for (int i =1 ; i<=nbMessages ; i++) {
+            perfectLink.send(new Message(i, id, new int[nbHosts]), receiver.getIp(), receiver.getPort())
+            Main.outputBuffer.add("b " + i);
+        }
     }
 
 }

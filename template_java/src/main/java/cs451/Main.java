@@ -7,12 +7,29 @@ import java.net.Socket;
 
 public class Main {
 
+    private static String outputPath;
+    public static Queue<String> outputBuffer = new LinkedList<>();
+
     private static void handleSignal() {
         //immediately stop network packet processing
         System.out.println("Immediately stopping network packet processing.");
 
         //write/flush output file if necessary
         System.out.println("Writing output.");
+
+        try {
+            File outputFile = new File(outputPath);
+            FileOutputStream s = new FileOutputStream(outputFile);
+            OutputStreamWriter w = new OutputStreamWriter(s);
+            while (outputBuffer.peek() != null) {
+                w.write(outputBuffer.poll());
+                w.write("\n");
+            }
+            w.close();
+            s.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void initSignalHandlers() {
@@ -36,6 +53,9 @@ public class Main {
         System.out.println("From a new terminal type `kill -SIGINT " + pid + "` or `kill -SIGTERM " + pid + "` to stop processing packets\n");
 
         System.out.println("My ID: " + parser.myId() + "\n");
+
+        Host myHost = null;
+
         System.out.println("List of resolved hosts is:");
         System.out.println("==========================");
         for (Host host: parser.hosts()) {
@@ -43,8 +63,36 @@ public class Main {
             System.out.println("Human-readable IP: " + host.getIp());
             System.out.println("Human-readable Port: " + host.getPort());
             System.out.println();
+
+            if (host.getId()==parser.myId() && myHost==null) {
+                myHost = host;
+            }
         }
         System.out.println();
+
+        int nbMessages = 0;
+        if (parser.hasConfig()) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(new File(parser.config())));
+                String s = reader.readLine();
+                s = s.replace(" ", "")
+                nbMessages = Integer.parse(s.charAt(0));
+                int receiverId = Integer.parse(s.charAt(1));
+                Host receiver;
+                for (Host h : parser.hosts()) {
+                    if (h.getId() == receiver.getId()) receiver = h;
+                }
+                reader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (myHost != null) {
+                myHost.init(parser.hosts(), nbMessages, receiver);
+            } else {
+                System.out.println("Invalid id");
+            }
+        }
 
         System.out.println("Path to output:");
         System.out.println("===============");
@@ -57,6 +105,8 @@ public class Main {
         System.out.println("Doing some initialization\n");
 
         System.out.println("Broadcasting and delivering messages...\n");
+
+        if (myHost != null) myHost.broadcast();
 
         // After a process finishes broadcasting,
         // it waits forever for the delivery of messages.
