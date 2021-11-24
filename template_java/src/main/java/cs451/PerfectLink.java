@@ -7,7 +7,7 @@ import cs451.MessageWithId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PerfectLink implements Listener {
+public class PerfectLink extends UnderlyingProtocol implements Listener {
 
     private FairLossLink fairLossLink;
     private List<Host> hosts;
@@ -64,8 +64,7 @@ public class PerfectLink implements Listener {
 
             if (!delivered.contains(m)) {
                 delivered.add(m);
-		
-                Main.outputBuffer.add("d " + m.message.senderId + " " + m.message.seq);
+		listener.deliver(m, srcId);
             }
         }
     }

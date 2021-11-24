@@ -18,7 +18,7 @@ public class Host {
     private Host receiver;
     private int nbHosts;
     private int nbMessages;
-    private PerfectLink perfectLink;
+    private FifoBroadcast fb;
 
     public boolean populate(String idString, String ipString, String portString) {
         try {
@@ -55,7 +55,10 @@ public class Host {
         this.receiver = receiver;
 
         FairLossLink fairlossLink = new FairLossLink(ip, port, hosts);
-        perfectLink = new PerfectLink(fairlossLink, hosts);
+        PerfectLink perfectLink = new PerfectLink(fairlossLink, hosts);
+	BestEffortBroadcast beb = new BestEffortBroadcast(perfectLink, hosts);
+        UniformReliableBroadcast urb = new UniformReliableBroadcast(beb, nbHosts);
+	fb = new FifoBroadcast(urb, nbHosts);
 
         receiveThread = new ReceiveThread(fairlossLink);
 
@@ -78,7 +81,7 @@ public class Host {
         receiveThread.start();
 
         for (int i =1 ; i<=nbMessages ; i++) {
-            perfectLink.send(new Message(i, id, new int[nbHosts]), receiver.getIp(), receiver.getPort());
+            fb.broadcast(new Message(i, id));
 	
             Main.outputBuffer.add("b " + i);
         }
