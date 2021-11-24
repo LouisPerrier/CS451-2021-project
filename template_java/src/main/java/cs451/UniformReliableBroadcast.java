@@ -1,4 +1,4 @@
-package cs451.protocol;
+package cs451;
 
 import cs451.Main;
 import cs451.Message;

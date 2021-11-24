@@ -81,7 +81,7 @@ public class Host {
         receiveThread.start();
 
         for (int i =1 ; i<=nbMessages ; i++) {
-            fb.broadcast(new Message(i, id));
+            fb.broadcast(new Message(i, id, new int[nbHosts]));
 	
             Main.outputBuffer.add("b " + i);
         }
